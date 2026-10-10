@@ -55,3 +55,15 @@
 - [x] **Multi-Agent Containment**: Sub-agent delegation boundaries and capability escalation policies (`ContainmentPolicy`, `ContainmentMonitor`).
 - [x] **Governance & Provenance Auditing**: Deterministic canonical SHA-256 manifest generation and integrity verification (`ProvenanceManifest`, `verify_run_integrity`, `uaise audit`).
 - [x] **Mechanistic Interpretability**: Output distribution Shannon entropy and activation anomaly detection (`LogitEntropySignal`, `ActivationAnomalyMonitor`).
+
+## Milestone 9: Advanced Adversarial Red-Teaming & Prompt Injection (Track 4)
+- [x] Adversarial attack payload representations (`AdversarialPayload`, `AttackStrategy`: delimiter evasion, base64 smuggling, indirect instruction injection).
+- [x] Realistic prompt injection benchmark (`PromptInjectionBenchmark`).
+- [x] Heuristic and semantic injection defense monitor (`PromptInjectionMonitor`).
+- [x] Register benchmark in `src/uaise/benchmarks/registry.py`.
+
+## Milestone 10: Correlated Monitor Failure & Bayesian Evidence Fusion (Tracks 5 & 11)
+- [x] Monitor correlation matrix calculation (`compute_monitor_correlation_matrix` to detect correlated blind spots).
+- [x] Risk score threshold sweeping (`sweep_decision_thresholds`, AUC-ROC, AUC-PR).
+- [x] Calibrated Bayesian evidence fusion monitor (`BayesianFusionMonitor`).
+- [x] Expose correlation and ROC/PR analysis in CLI, reports, and REST API.

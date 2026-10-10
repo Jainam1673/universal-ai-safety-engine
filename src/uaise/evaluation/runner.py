@@ -13,8 +13,10 @@ from uaise import __version__
 from uaise.agents.base import Agent
 from uaise.benchmarks.base import Benchmark
 from uaise.core.types import Action, EvaluationMetrics, RunMetadata, ScenarioResult, ViolationType
+from uaise.evaluation.correlation import compute_monitor_correlation_matrix
 from uaise.evaluation.metrics import compute_metrics
 from uaise.evaluation.statistics import ConfidenceInterval, compute_all_bootstrap_ci
+from uaise.evaluation.thresholds import ThresholdCurve, sweep_decision_thresholds
 from uaise.monitors.base import Monitor
 
 
@@ -26,6 +28,8 @@ class EvaluationRunResult:
     scenario_results: list[ScenarioResult]
     metrics: dict[str, EvaluationMetrics]
     confidence_intervals: dict[str, dict[str, ConfidenceInterval]] = field(default_factory=dict)
+    correlation_matrix: dict[str, dict[str, float]] = field(default_factory=dict)
+    threshold_curves: dict[str, ThresholdCurve] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -70,6 +74,10 @@ class EvaluationRunResult:
             "confidence_intervals": {
                 m_id: {k: v.to_dict() for k, v in ci_dict.items()}
                 for m_id, ci_dict in self.confidence_intervals.items()
+            },
+            "correlation_matrix": self.correlation_matrix,
+            "threshold_curves": {
+                m_id: curve.to_dict() for m_id, curve in self.threshold_curves.items()
             },
         }
 
@@ -139,6 +147,30 @@ class EvaluationRunner:
                 seed=self.seed,
             )
 
+        # Compute monitor correlation matrix
+        decisions_by_monitor: dict[str, list[bool]] = {}
+        for monitor in self.monitors:
+            decisions_by_monitor[monitor.monitor_id] = [
+                r.monitor_decisions[monitor.monitor_id].is_flagged
+                for r in results
+                if monitor.monitor_id in r.monitor_decisions
+            ]
+        correlation_matrix = compute_monitor_correlation_matrix(decisions_by_monitor)
+
+        # Compute threshold curves (ROC and PR)
+        threshold_curves: dict[str, ThresholdCurve] = {}
+        ground_truths = [r.ground_truth_violation for r in results]
+        for monitor in self.monitors:
+            scores = [
+                r.monitor_decisions[monitor.monitor_id].risk_score
+                for r in results
+                if monitor.monitor_id in r.monitor_decisions
+            ]
+            if len(scores) == len(ground_truths) and len(scores) > 0:
+                threshold_curves[monitor.monitor_id] = sweep_decision_thresholds(
+                    scores, ground_truths
+                )
+
         metadata = RunMetadata(
             run_id=run_id,
             timestamp=datetime.now(UTC).isoformat(),
@@ -156,4 +188,6 @@ class EvaluationRunner:
             scenario_results=results,
             metrics=metrics,
             confidence_intervals=confidence_intervals,
+            correlation_matrix=correlation_matrix,
+            threshold_curves=threshold_curves,
         )

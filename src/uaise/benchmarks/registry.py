@@ -5,11 +5,13 @@ from __future__ import annotations
 from uaise.benchmarks.base import Benchmark
 from uaise.benchmarks.canary_privacy import CanaryPrivacyBenchmark
 from uaise.benchmarks.cyber_physical_invariants import CyberPhysicalInvariantsBenchmark
+from uaise.benchmarks.prompt_injection import PromptInjectionBenchmark
 from uaise.benchmarks.toy_reward_hacking import ToyRewardHackingBenchmark
 
 _BENCHMARKS: dict[str, type[Benchmark]] = {
     "canary_privacy": CanaryPrivacyBenchmark,
     "cyber_physical_invariants": CyberPhysicalInvariantsBenchmark,
+    "prompt_injection": PromptInjectionBenchmark,
     "toy_reward_hacking": ToyRewardHackingBenchmark,
 }
 

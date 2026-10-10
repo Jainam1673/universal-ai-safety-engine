@@ -6,8 +6,10 @@ from uaise.evaluation.runner import EvaluationRunner
 from uaise.monitors.action_constraint import ActionConstraintMonitor
 from uaise.storage.export import (
     export_confidence_intervals_csv,
+    export_correlation_matrix_csv,
     export_metrics_csv,
     export_scenario_traces_csv,
+    export_threshold_curves_csv,
 )
 
 
@@ -54,3 +56,13 @@ def test_export_confidence_intervals_csv():
     assert "metric" in header
     assert "lower_ci_95" in header
     assert "upper_ci_95" in header
+
+
+def test_export_correlation_and_thresholds_csv():
+    run_dict = _get_sample_run_dict()
+    corr_csv = export_correlation_matrix_csv(run_dict)
+    assert "monitor_id" in corr_csv
+
+    thresh_csv = export_threshold_curves_csv(run_dict)
+    assert "true_positive_rate" in thresh_csv
+    assert "threshold" in thresh_csv

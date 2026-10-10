@@ -25,8 +25,10 @@ from uaise.reporting.markdown_report import generate_markdown_report
 from uaise.storage.artifact import RunStorage
 from uaise.storage.export import (
     export_confidence_intervals_csv,
+    export_correlation_matrix_csv,
     export_metrics_csv,
     export_scenario_traces_csv,
+    export_threshold_curves_csv,
 )
 
 
@@ -115,6 +117,22 @@ def create_app() -> FastAPI:
         if not data:
             raise HTTPException(status_code=404, detail=f"Run '{run_id}' not found.")
         csv_text = export_confidence_intervals_csv(data)
+        return Response(content=csv_text, media_type="text/csv")
+
+    @app.get("/runs/{run_id}/correlation.csv")
+    def get_correlation_csv(run_id: str) -> Response:
+        data = storage.load_run_by_id(run_id)
+        if not data:
+            raise HTTPException(status_code=404, detail=f"Run '{run_id}' not found.")
+        csv_text = export_correlation_matrix_csv(data)
+        return Response(content=csv_text, media_type="text/csv")
+
+    @app.get("/runs/{run_id}/thresholds.csv")
+    def get_thresholds_csv(run_id: str) -> Response:
+        data = storage.load_run_by_id(run_id)
+        if not data:
+            raise HTTPException(status_code=404, detail=f"Run '{run_id}' not found.")
+        csv_text = export_threshold_curves_csv(data)
         return Response(content=csv_text, media_type="text/csv")
 
     @app.post("/runs/evaluate")

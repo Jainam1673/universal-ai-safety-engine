@@ -141,3 +141,58 @@ def export_confidence_intervals_csv(run_data: dict[str, Any]) -> str:
             )
 
     return output.getvalue()
+
+
+def export_correlation_matrix_csv(run_data: dict[str, Any]) -> str:
+    """Export pairwise monitor correlation matrix to CSV format."""
+    corr_map = run_data.get("correlation_matrix", {})
+    monitors = list(corr_map.keys())
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["monitor_id"] + monitors)
+
+    for m_a in monitors:
+        row = [m_a] + [corr_map[m_a].get(m_b, 0.0) for m_b in monitors]
+        writer.writerow(row)
+
+    return output.getvalue()
+
+
+def export_threshold_curves_csv(run_data: dict[str, Any]) -> str:
+    """Export parametric threshold sweep points (ROC/PR) to CSV format."""
+    run_id = run_data.get("metadata", {}).get("run_id", "")
+    thresh_curves = run_data.get("threshold_curves", {})
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(
+        [
+            "run_id",
+            "monitor_id",
+            "threshold",
+            "true_positive_rate",
+            "false_positive_rate",
+            "precision",
+            "recall",
+            "f1_score",
+        ]
+    )
+
+    for m_id, curve in thresh_curves.items():
+        points = curve.get("points", [])
+        for pt in points:
+            writer.writerow(
+                [
+                    run_id,
+                    m_id,
+                    pt.get("threshold", 0.0),
+                    pt.get("true_positive_rate", 0.0),
+                    pt.get("false_positive_rate", 0.0),
+                    pt.get("precision", 0.0),
+                    pt.get("recall", 0.0),
+                    pt.get("f1_score", 0.0),
+                ]
+            )
+
+    return output.getvalue()

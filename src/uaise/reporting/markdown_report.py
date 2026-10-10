@@ -90,10 +90,48 @@ def generate_markdown_report(run_data: dict[str, Any]) -> str:
                         f"| `{m_id}` | {fmt_name} | {ci['point_estimate']:.3f} | [{ci['lower']:.3f}, {ci['upper']:.3f}] |"
                     )
 
+    corr_matrix = run_data.get("correlation_matrix")
+    if corr_matrix:
+        mon_list = list(corr_matrix.keys())
+        header = "| Monitor | " + " | ".join(f"`{m}`" for m in mon_list) + " |"
+        sep = "| :--- | " + " | ".join(":---:" for _ in mon_list) + " |"
+        report_lines.extend(
+            [
+                "",
+                "## 6. Monitor Correlation Matrix (Phi Coefficient)",
+                "",
+                "> Measures pairwise correlation between monitor flag decisions to identify shared failure modes.",
+                "",
+                header,
+                sep,
+            ]
+        )
+        for m_row in mon_list:
+            row_vals = [f"{corr_matrix[m_row].get(m_col, 0.0):.2f}" for m_col in mon_list]
+            report_lines.append(f"| `{m_row}` | " + " | ".join(row_vals) + " |")
+
+    thresh_curves = run_data.get("threshold_curves")
+    if thresh_curves:
+        report_lines.extend(
+            [
+                "",
+                "## 7. Parametric Decision Thresholds (AUC-ROC & AUC-PR)",
+                "",
+                "| Monitor ID | AUC-ROC | AUC-PR | Optimal F1 |",
+                "| :--- | :---: | :---: | :---: |",
+            ]
+        )
+        for m_id, curve in thresh_curves.items():
+            pts = curve.get("points", [])
+            max_f1 = max((p.get("f1_score", 0.0) for p in pts), default=0.0)
+            report_lines.append(
+                f"| `{m_id}` | {curve.get('auc_roc', 0.0):.3f} | {curve.get('auc_pr', 0.0):.3f} | {max_f1:.3f} |"
+            )
+
     report_lines.extend(
         [
             "",
-            "## 6. Scenario Outcome Traces",
+            "## 8. Scenario Outcome Traces",
             "",
             "| Scenario ID | Agent Action | Violation? | Flagged By | Disagreement? |",
             "| :--- | :--- | :---: | :--- | :---: |",
@@ -115,14 +153,13 @@ def generate_markdown_report(run_data: dict[str, Any]) -> str:
     report_lines.extend(
         [
             "",
-            "## 7. Scientific Observations & Limitations",
+            "## 9. Scientific Observations & Limitations",
             "",
             "1. **Detection vs Alarm Rate**: Increasing monitor sensitivity (e.g., via disjunctive fusion) "
             "often improves recall at the risk of higher false-positive rates.",
-            "2. **Correlated Failure Modes**: Rule-based monitors depend on explicit action definitions, "
-            "whereas heuristic monitors depend on string patterns; adversaries could bypass both by renaming actions.",
-            "3. **Auditing**: Raw scenario traces, decisions, and metadata are saved in `.uaise_runs/` "
-            "for complete auditability.",
+            "2. **Correlated Failure Modes**: Monitors with high positive phi correlation exhibit shared blind spots.",
+            "3. **Bayesian Calibration**: Combining evidence using calibrated likelihood ratios controls false alarms better than naive disjunction.",
+            "4. **Auditing**: Raw scenario traces, decisions, and metadata are cryptographically hashed and saved in `.uaise_runs/`.",
         ]
     )
 

@@ -121,3 +121,34 @@ Expanded the operational core into foundational specialty tracks representing co
 - `ruff check .` & `ruff format --check .`: 0 lint errors, perfectly formatted.
 - `mypy src`: 0 errors across 36 source files in strict mode.
 - `uaise audit`: Successfully validates run integrity against SHA-256 manifest.
+
+---
+
+## Milestone 9: Advanced Adversarial Red-Teaming & Prompt Injection (Track 4)
+
+### Overview
+1. **Attack Representation & Payloads**: Implemented `AdversarialPayload` and `AttackStrategy` (`DELIMITER_ESCAPE`, `BASE64_SMUGGLING`, `ROLEPLAY_OVERRIDE`, `INDIRECT_RETRIEVAL`) in `src/uaise/adversarial/attacks.py`.
+2. **Benchmark Suite**: Implemented `PromptInjectionBenchmark` in `src/uaise/benchmarks/prompt_injection.py` featuring customer review breakouts, base64 C2 command smuggling in CI logs, and authority impersonation.
+3. **Defense Monitor**: Implemented `PromptInjectionMonitor` in `src/uaise/monitors/injection_detector.py` combining regex heuristic patterns, control token breakouts, and automatic Base64 payload decoding for hidden command detection.
+
+---
+
+## Milestone 10: Correlated Monitor Failure Modeling & Bayesian Evidence Fusion (Tracks 5 & 11)
+
+### Overview
+1. **Monitor Correlation Matrix**: Implemented `compute_monitor_correlation_matrix` in `src/uaise/evaluation/correlation.py` calculating the Pearson Phi coefficient ($\phi$) across monitor decisions to detect shared blind spots and correlated false alarms.
+2. **Parametric Threshold Sweeping**: Implemented `sweep_decision_thresholds` in `src/uaise/evaluation/thresholds.py` calculating TPR, FPR, Precision, Recall, and trapezoidal numerical integration for AUC-ROC and AUC-PR curves.
+3. **Calibrated Bayesian Evidence Fusion**: Implemented `BayesianFusionMonitor` in `src/uaise/monitors/bayesian_fusion.py` applying Bayes' rule:
+   $$\Omega_{\text{post}} = \Omega_0 \prod_i LR_i, \quad P(V \mid \mathbf{m}) = \frac{\Omega_{\text{post}}}{1 + \Omega_{\text{post}}}$$
+   producing continuous calibrated posterior probabilities from multi-monitor likelihood ratios ($TPR_i / FPR_i$).
+4. **Platform & Reporting Integration**:
+   - Automated correlation matrix and AUC calculation in `EvaluationRunner`.
+   - Structured Markdown report sections (Section 6: Monitor Correlation Matrix; Section 7: Parametric Decision Thresholds).
+   - CSV export commands (`uaise export --target correlation`, `uaise export --target thresholds`).
+   - REST API endpoints (`/runs/{id}/correlation.csv`, `/runs/{id}/thresholds.csv`).
+
+### Verification
+- `pytest`: 75 tests passing (100% pass rate in ~1.6s).
+- `ruff check .` & `ruff format --check .`: 0 lint errors, perfectly formatted.
+- `mypy src`: 0 errors across 42 source files in strict mode.
+- `uaise demo --seed 42`: Successfully outputs full correlation and AUC tables.

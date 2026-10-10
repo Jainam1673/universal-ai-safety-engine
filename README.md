@@ -38,6 +38,9 @@ To ensure absolute research integrity, capabilities are explicitly categorized b
 | **Implemented & Tested** | Multi-Agent Containment | Capability bounding and delegation depth limiting (`ContainmentPolicy`, `ContainmentMonitor`). |
 | **Implemented & Tested** | Governance & Audit Provenance| Canonical SHA-256 manifest generation and integrity verification (`ProvenanceManifest`, `verify_run_integrity`, `uaise audit`). |
 | **Implemented & Tested** | Mechanistic Interpretability | Shannon logit entropy calculation and activation anomaly detection (`LogitEntropySignal`, `ActivationAnomalyMonitor`). |
+| **Implemented & Tested** | Prompt Injection Benchmark | Delimiter breakout, base64 payload smuggling, and roleplay overrides (`PromptInjectionBenchmark`, `PromptInjectionMonitor`). |
+| **Implemented & Tested** | Bayesian Evidence Fusion | Continuous Bayesian posterior updates modeling monitor TPR/FPR likelihoods (`BayesianFusionMonitor`). |
+| **Implemented & Tested** | Correlated Failure Analysis | Pearson Phi ($\phi$) correlation matrix and parametric decision threshold sweeps (AUC-ROC / AUC-PR). |
 
 ---
 
@@ -139,6 +142,11 @@ flowchart TD
 | Multi-Agent Containment | `uaise.containment` | `tests/test_containment.py` | Verified |
 | Cryptographic Run Provenance | `uaise.governance` | `tests/test_provenance.py` | Verified |
 | Mechanistic Interpretability | `uaise.interpretability` | `tests/test_interpretability.py` | Verified |
+| Prompt Injection Benchmark | `uaise.benchmarks.prompt_injection` | `tests/test_prompt_injection.py` | Verified |
+| Prompt Injection Monitor | `uaise.monitors.injection_detector` | `tests/test_prompt_injection.py` | Verified |
+| Monitor Correlation Analysis | `uaise.evaluation.correlation` | `tests/test_correlation_and_thresholds.py` | Verified |
+| Threshold Sweeps & ROC/PR | `uaise.evaluation.thresholds` | `tests/test_correlation_and_thresholds.py` | Verified |
+| Bayesian Evidence Fusion | `uaise.monitors.bayesian_fusion` | `tests/test_correlation_and_thresholds.py` | Verified |
 | CLI Diagnostic, Export & Audit| `uaise.cli` | `tests/test_cli.py` | Verified |
 
 ---

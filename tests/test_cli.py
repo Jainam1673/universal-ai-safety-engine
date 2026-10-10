@@ -90,3 +90,15 @@ def test_cli_audit(capsys):
     assert "UAISE Provenance & Integrity Audit" in captured.out
     assert "[PASS] VALID" in captured.out
     assert "Cryptographic integrity verified" in captured.out
+
+
+def test_cli_export_correlation_and_thresholds(capsys):
+    ret_corr = main(["export", "--target", "correlation", "--format", "csv"])
+    assert ret_corr == 0
+    out_corr = capsys.readouterr().out
+    assert "monitor_id" in out_corr
+
+    ret_thresh = main(["export", "--target", "thresholds", "--format", "csv"])
+    assert ret_thresh == 0
+    out_thresh = capsys.readouterr().out
+    assert "true_positive_rate" in out_thresh

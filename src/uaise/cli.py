@@ -24,8 +24,10 @@ from uaise.reporting.markdown_report import generate_markdown_report
 from uaise.storage.artifact import RunStorage
 from uaise.storage.export import (
     export_confidence_intervals_csv,
+    export_correlation_matrix_csv,
     export_metrics_csv,
     export_scenario_traces_csv,
+    export_threshold_curves_csv,
 )
 
 
@@ -128,7 +130,7 @@ def build_parser() -> argparse.ArgumentParser:
     export_parser.add_argument(
         "--target",
         type=str,
-        choices=["traces", "metrics", "ci"],
+        choices=["traces", "metrics", "ci", "correlation", "thresholds"],
         default="traces",
         help="Data to export",
     )
@@ -314,6 +316,10 @@ def run_export_cmd(args: argparse.Namespace) -> int:
         content = export_metrics_csv(data)
     elif args.target == "ci":
         content = export_confidence_intervals_csv(data)
+    elif args.target == "correlation":
+        content = export_correlation_matrix_csv(data)
+    elif args.target == "thresholds":
+        content = export_threshold_curves_csv(data)
     else:
         content = export_scenario_traces_csv(data)
 

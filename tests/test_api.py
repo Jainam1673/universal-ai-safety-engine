@@ -51,6 +51,16 @@ def test_api_benchmarks_and_evaluate():
     assert res_csv.status_code == 200
     assert "scenario_id" in res_csv.text
 
+    # Retrieve correlation CSV
+    res_corr = client.get(f"/runs/{run_id}/correlation.csv")
+    assert res_corr.status_code == 200
+    assert "monitor_id" in res_corr.text
+
+    # Retrieve thresholds CSV
+    res_thresh = client.get(f"/runs/{run_id}/thresholds.csv")
+    assert res_thresh.status_code == 200
+    assert "true_positive_rate" in res_thresh.text
+
 
 def test_api_not_found_run():
     app = create_app()
